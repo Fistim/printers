@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ .Title }}</title>
+</head>
+<body>
+	<h4>Генерировать QR-код</h4>
+	<p>Выберите принтер</p>
+	<form action="/generate" method="POST">
+		<select name="printer" id="printer">
+		{{ range .PrinterNames }}
+			<option value="{{ . }}">{{ . }}</option>
+		{{ end }}
+		</select><br><br><br>
+		<input type="submit" value="Генерировать QR">
+	</form>
+	<form method="POST" action="/addprinter">
+		<h4>Добавить принтер</h4>
+		<input placeholder="Наименование принтера" type="text" name="printerName">
+		<input type="submit" name="addprinterbtn" value="Добавить принтер">
+	</form>
+	
+	<form method="POST" action="/addcartridge">
+		<h4>Добавить картридж</h4>
+		<input required type="text" name="cartridgeName" placeholder="Наименование картриджа">
+		<input type="submit" name="addcartridgebtn" value="Добавить картридж">
+	</form>
+
+	<h4>Добавить совместимость</h4>
+	<form name="addcartridgeofprinter" action="/cartridgeOfPrinter">
+		<select name="printers" id="printers" >
+			<option></option>
+			{{ range .PrinterNames }}
+			<option value="{{ . }}">{{ . }}</option>
+			{{ end }}
+		</select>
+		<select name="cartridges" id="cartridges">
+			<option></option>
+			{{ range .CartridgeNames }}
+			<option value="{{ . }}">{{ . }}</option>
+			{{ end }}
+		</select>
+		<input type="submit" value="Добавить совместимость">
+	</form>
+	<br><br>
+	<input type="button" value="Найти совместимый картридж">
+</body>
+</html>

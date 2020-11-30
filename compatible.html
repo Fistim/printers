@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ .Title }}</title>
+</head>
+<body>
+	<form action="/compatible" method="POST">
+		<select name="printer" id="printer">
+		{{ range .PrinterNames }}
+			<option value="{{ . }}">{{ . }}</option>
+		{{ end }}
+		</select><br><br><br>
+		<input type="submit" value="Найти совместимый картридж">
+	</form>
+	<ul>
+		{{ range .CartridgeNames }}
+		<li>{{ . }}</li>
+		{{ end }}
+	</ul>
+</body>
+</html>
