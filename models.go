@@ -12,16 +12,16 @@ type Output struct {
 }
 
 type Printers struct {
-	Id   uint   `gorm:"type:integer"`
+	ID   uint   `gorm:"AUTO_INCREMENT;type:integer"`
 	Name string `gorm:"type:text"`
 }
 
 type Cartridges struct {
-	Id   uint   `gorm:"type:integer"`
+	ID   uint   `gorm:"AUTO_INCREMENT;type:integer"`
 	Name string `gorm:"type:text"`
 }
 
 type Cartridgeofprinter struct {
-	Cartridgeid uint `gorm:"type:integer"`
-	Printerid   uint `gorm:"type:integer"`
+	Cartridge_Id uint `gorm:"type:integer"`
+	Printer_Id   uint `gorm:"type:integer"`
 }

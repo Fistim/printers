@@ -40,26 +40,21 @@ func PrinterPage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error during opening DB")
 	} else {
 		name := mux.Vars(r)["printerName"]
-		fmt.Println("Selected printer: " + name)
 		var printer Printers
-		db.Where("Name LIKE ?", name).First(&printer)
+		db.Where("Name = ?", name).First(&printer)
 
 		var printers []Printers
 		db.Find(&printers)
-		fmt.Println(printers)
 		fmt.Println(printer)
-		if printer.Id > 0 {
+		if printer.ID > 0 {
 			var cartridges []string
 			var cot []Cartridgeofprinter
-			db.Where("PrinterID = ?", printer.Id).Find(&cot)
-			fmt.Println(cot)
-			fmt.Println("Printer ID = ")
-			fmt.Println(printer.Id)
+			db.Find(&cot)
+			db.Where("Printer_Id = ?", printer.ID).Find(&cot)
 			for _, v := range cot {
 				var cart Cartridges
-				if v.Cartridgeid != 0{
-					fmt.Println(v.Cartridgeid)
-					db.Where("ID = ?", v.Cartridgeid).First(&cart)
+				if v.Printer_Id == printer.ID{
+					db.Where("ID = ?", v.Cartridge_Id).First(&cart)
 					cartridges = append(cartridges, cart.Name)
 				}
 			}
@@ -97,28 +92,27 @@ func FindCompatibleCartridges(w http.ResponseWriter, r *http.Request) {
 		PrinterName = append(PrinterName, pr.Name)
 	}
 
-	var printer Printers
+	// var printer Printers
 	r.ParseForm()
 	selectedPrinter := strings.Join(r.Form["printer"], "")
-	fmt.Println("Selected: " + selectedPrinter)
 
 	if selectedPrinter != "" {
-		db.Where("Name = ?", selectedPrinter).First(&printer)
-		var cops []uint
-		db.Table("CartridgeOfPrinters").Where("PrinterID = ?", printer.Id).Select("CartridgeID").Find(&cops)
+		// db.Where("Name = ?", selectedPrinter).First(&printer)
+		// var cops []uint
+		// db.Table("CartridgeOfPrinters").Where("PrinterID = ?", printer.ID).Select("CartridgeID").Find(&cops)
 
-		var cartridgeName []string
+		// var cartridgeName []string
 
-		for _, cop := range cops {
-			var cart Cartridges
-			db.Where("ID = ?", cop).First(&cart)
-			cartridgeName = append(cartridgeName, cart.Name)
-		}
-		// data := ViewData{
-		// Title: "Совместимость картриджей",
-		// PrinterNames: PrinterName,
-		// CartridgeNames: cartridgeName,
+		// for _, cop := range cops {
+		// 	var cart Cartridges
+		// 	db.Where("ID = ?", cop).First(&cart)
+		// 	cartridgeName = append(cartridgeName, cart.Name)
 		// }
+		// // data := ViewData{
+		// // Title: "Совместимость картриджей",
+		// // PrinterNames: PrinterName,
+		// // CartridgeNames: cartridgeName,
+		// // }
 
 		http.Redirect(w, r, "/printer/"+selectedPrinter, 301)
 		return
@@ -141,13 +135,13 @@ func AddCartridgeOfPrinter(w http.ResponseWriter, r *http.Request) {
 	// printerName := strings.Join(r.Form["printers"], "")
 	var cartridge Cartridges
 	db.Where("Name = ?", cartridgeName).First(&cartridge)
-	cartridgeID := cartridge.Id
+	cartridgeID := cartridge.ID
 	var printer Printers
 	db.Where("Name = ?", printerName).First(&printer)
-	printerID := printer.Id
+	printerID := printer.ID
 	var cop Cartridgeofprinter
-	cop.Cartridgeid = cartridgeID
-	cop.Printerid = printerID
+	cop.Cartridge_Id = cartridgeID
+	cop.Printer_Id = printerID
 	db.Create(&cop)
 	http.Redirect(w, r, "/", 302)
 }
@@ -205,19 +199,6 @@ func PrinterList(w http.ResponseWriter, r *http.Request) {
 
 	tmpl, _ := template.ParseFiles("generate.html")
 	tmpl.Execute(w, data)
-}
-
-func generateCompatibleCartridges(printer Printers) {
-	db, _ := gorm.Open(sqlite.Open("printer.db"), &gorm.Config{})
-	var cops []Cartridgeofprinter
-	var cartridges []Cartridges
-	db.Where("Printerid = ?", printer.Id).Find(&cops)
-	for _, cop := range cops {
-		var cartridge Cartridges
-		fmt.Println(cop.Cartridgeid)
-		db.Where("ID = ?", cop.Cartridgeid).First(&cartridge)
-		cartridges = append(cartridges, cartridge)
-	}
 }
 
 func cartridgeQR(text string, filename string) {
