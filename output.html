@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ .PrinterName }}</title>
+</head>
+<body>
+	<p>Выбранный принтер: {{ .PrinterName }}</p>
+	<p>Совместимые картриджи:</p>
+	<ul>
+		{{ range .Cartridges }}
+	</ul>
+</body>
+</html>
