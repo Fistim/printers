@@ -16,27 +16,6 @@ import (
 	"strings"
 )
 
-// type ViewData struct{
-// 	Title string
-// 	PrinterNames []string
-// 	CartridgeNames []string
-// }
-
-// type Printers struct{
-// 	ID uint `gorm:"type:integer"`
-// 	Name string `gorm:"type:text"`
-// }
-
-// type Cartridges struct{
-// 	ID uint `gorm:"type:integer"`
-// 	Name string `gorm:"type:text"`
-// }
-
-// type Cartridgeofprinter struct{
-// 	Cartridgeid uint `gorm:"type:integer"`
-// 	Printerid uint `gorm:"type:integer"`
-// }
-
 func main() {
 
 	r := mux.NewRouter()
@@ -63,17 +42,26 @@ func PrinterPage(w http.ResponseWriter, r *http.Request) {
 		name := mux.Vars(r)["printerName"]
 		fmt.Println("Selected printer: " + name)
 		var printer Printers
-		db.Where("Name = ?", name).First(&printer)
-		if printer.ID > 0 {
+		db.Where("Name LIKE ?", name).First(&printer)
 
+		var printers []Printers
+		db.Find(&printers)
+		fmt.Println(printers)
+		fmt.Println(printer)
+		if printer.Id > 0 {
 			var cartridges []string
 			var cot []Cartridgeofprinter
-			db.Where("PrinterID = ?", printer.ID).Find(&cot)
-
+			db.Where("PrinterID = ?", printer.Id).Find(&cot)
+			fmt.Println(cot)
+			fmt.Println("Printer ID = ")
+			fmt.Println(printer.Id)
 			for _, v := range cot {
 				var cart Cartridges
-				db.Where("ID = ?", v.Cartridgeid).First(&cart)
-				cartridges = append(cartridges, cart.Name)
+				if v.Cartridgeid != 0{
+					fmt.Println(v.Cartridgeid)
+					db.Where("ID = ?", v.Cartridgeid).First(&cart)
+					cartridges = append(cartridges, cart.Name)
+				}
 			}
 
 			data := Output{
@@ -117,7 +105,7 @@ func FindCompatibleCartridges(w http.ResponseWriter, r *http.Request) {
 	if selectedPrinter != "" {
 		db.Where("Name = ?", selectedPrinter).First(&printer)
 		var cops []uint
-		db.Table("CartridgeOfPrinters").Where("PrinterID = ?", printer.ID).Select("CartridgeID").Find(&cops)
+		db.Table("CartridgeOfPrinters").Where("PrinterID = ?", printer.Id).Select("CartridgeID").Find(&cops)
 
 		var cartridgeName []string
 
@@ -153,10 +141,10 @@ func AddCartridgeOfPrinter(w http.ResponseWriter, r *http.Request) {
 	// printerName := strings.Join(r.Form["printers"], "")
 	var cartridge Cartridges
 	db.Where("Name = ?", cartridgeName).First(&cartridge)
-	cartridgeID := cartridge.ID
+	cartridgeID := cartridge.Id
 	var printer Printers
 	db.Where("Name = ?", printerName).First(&printer)
-	printerID := printer.ID
+	printerID := printer.Id
 	var cop Cartridgeofprinter
 	cop.Cartridgeid = cartridgeID
 	cop.Printerid = printerID
@@ -223,7 +211,7 @@ func generateCompatibleCartridges(printer Printers) {
 	db, _ := gorm.Open(sqlite.Open("printer.db"), &gorm.Config{})
 	var cops []Cartridgeofprinter
 	var cartridges []Cartridges
-	db.Where("Printerid = ?", printer.ID).Find(&cops)
+	db.Where("Printerid = ?", printer.Id).Find(&cops)
 	for _, cop := range cops {
 		var cartridge Cartridges
 		fmt.Println(cop.Cartridgeid)

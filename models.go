@@ -12,12 +12,12 @@ type Output struct {
 }
 
 type Printers struct {
-	ID   uint   `gorm:"type:integer"`
+	Id   uint   `gorm:"type:integer"`
 	Name string `gorm:"type:text"`
 }
 
 type Cartridges struct {
-	ID   uint   `gorm:"type:integer"`
+	Id   uint   `gorm:"type:integer"`
 	Name string `gorm:"type:text"`
 }
 
