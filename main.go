@@ -12,9 +12,18 @@ import (
 	"image/png"
 	"log"
 	"net/http"
+	"io/ioutil"
 	"os"
 	"strings"
+	"math/rand"
+	"time"
 )
+
+func init() {
+    rand.Seed(time.Now().UnixNano())
+}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func main() {
 
@@ -22,6 +31,7 @@ func main() {
 
 	r.HandleFunc("/", PrinterList)
 	r.HandleFunc("/generate", GenerateQR)
+	r.HandleFunc("/generateCompatible", generateCompatible)
 	r.HandleFunc("/addprinter", AddPrinter)
 	r.HandleFunc("/addcartridge", AddCartridge)
 	r.HandleFunc("/cartridgeOfPrinter", AddCartridgeOfPrinter)
@@ -31,6 +41,24 @@ func main() {
 
 	http.Handle("/", r)
 	http.ListenAndServe(":8888", nil)
+}
+
+func generateCompatible(w http.ResponseWriter, r *http.Request){
+	fmt.Println("New generating request from" + r.RemoteAddr)
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil{
+		fmt.Println("Something went wrong during generating QR code")
+		fmt.Fprintf(w, "Something went wrong during generating QR code")
+	}
+	filename := GenerateRandomString(10)
+	fmt.Println("Generated name " + filename + " for " + r.RemoteAddr)
+	generateFromText(string(data), filename)
+	fmt.Println("Generated file " + filename + ".png for " + r.RemoteAddr)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename +".png"))
+	http.ServeFile(w, r, filename)
+	fmt.Println("Served file " + filename + ".png for " + r.RemoteAddr)
+	os.Remove(filename + ".png")
+	fmt.Println("Removed file " + filename + ".png")
 }
 
 func PrinterPage(w http.ResponseWriter, r *http.Request) {
@@ -170,7 +198,7 @@ func GenerateQR(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	text := strings.Join(r.Form["printer"], "")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", text+".png"))
-	generateFromText(text)
+	generateFromText(text, text)
 	http.ServeFile(w, r, text)
 }
 
@@ -217,7 +245,7 @@ func cartridgeQR(text string, filename string) {
 	writePng(filename, code)
 }
 
-func generateFromText(text string) {
+func generateFromText(text string, filename string) {
 	code, err := qr.Encode(text, qr.L, qr.Auto)
 	if err != nil {
 		fmt.Println("Something went wrong...")
@@ -230,11 +258,11 @@ func generateFromText(text string) {
 		log.Fatal(err)
 	}
 
-	writePng(text, code)
+	writePng(filename, code)
 }
 
 func writePng(filename string, img image.Image) {
-	file, err := os.Create(filename)
+	file, err := os.Create(filename + ".png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -243,4 +271,12 @@ func writePng(filename string, img image.Image) {
 		log.Fatal(err)
 	}
 	file.Close()
+}
+
+func GenerateRandomString(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letterRunes[rand.Intn(len(letterRunes))]
+    }
+    return string(b)
 }

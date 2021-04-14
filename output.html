@@ -11,5 +11,25 @@
 		<li>{{ . }}</li>
 		{{ end }}
 	</ul>
+
+	<input type="button" name="generateQR" value="Сгенерировать QR" onclick="getURL();">
+
+
+	<script type="text/javascript">
+		function getURL() {
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", '/generateCompatible', true);
+			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xhr.send(window.location.href.toString());
+
+			// var http = new XMLHttpRequest();
+	  //   	var url = '/generate'
+	  //   	var params = window.location.href
+	  //   	http.open('POST', url, true)
+	  //   	http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	  //   	http.Send(params);
+    	}
+
+	</script>
 </body>
 </html>
