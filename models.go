@@ -6,7 +6,7 @@ type ViewData struct {
 	CartridgeNames []string
 }
 
-type CartridgesOutput struct{
+type CartridgesOutput struct {
 	Name []string
 }
 
@@ -21,9 +21,9 @@ type Printers struct {
 }
 
 type Cartridges struct {
-	ID   uint   `gorm:"AUTO_INCREMENT;type:integer"`
-	Name string `gorm:"type:text"`
-	Quantity uint `gorm:"type:integer"`
+	ID       uint   `gorm:"AUTO_INCREMENT;type:integer"`
+	Name     string `gorm:"type:text"`
+	Quantity uint   `gorm:"type:integer"`
 }
 
 type Cartridgeofprinter struct {

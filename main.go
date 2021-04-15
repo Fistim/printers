@@ -10,20 +10,20 @@ import (
 	"html/template"
 	"image"
 	"image/png"
-	"log"
-	"net/http"
 	"io/ioutil"
+	"log"
+	"math/rand"
+	"net/http"
 	"os"
 	"strings"
-	"math/rand"
 	"time"
 )
 
 func init() {
-    rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 }
 
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 
 func main() {
 	port := os.Getenv("PORT")
@@ -40,15 +40,14 @@ func main() {
 	r.HandleFunc("/cartridges", CartridgePage)
 	fmt.Println("Server is listening...")
 
-
 	http.Handle("/", r)
-	http.ListenAndServe(":" + port, nil)
+	http.ListenAndServe(":"+port, nil)
 }
 
-func generateCompatible(w http.ResponseWriter, r *http.Request){
+func generateCompatible(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("New generating request from" + r.RemoteAddr)
 	data, err := ioutil.ReadAll(r.Body)
-	if err != nil{
+	if err != nil {
 		fmt.Println("Something went wrong during generating QR code")
 		fmt.Fprintf(w, "Something went wrong during generating QR code")
 	}
@@ -56,37 +55,25 @@ func generateCompatible(w http.ResponseWriter, r *http.Request){
 	fmt.Println("Generated name " + filename + " for " + r.RemoteAddr)
 	generateFromText(string(data), filename)
 	fmt.Println("Generated file " + filename + ".png for " + r.RemoteAddr)
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename +".png"))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename+".png"))
 	http.ServeFile(w, r, filename)
 	fmt.Println("Served file " + filename + ".png for " + r.RemoteAddr)
 	os.Remove(filename + ".png")
 	fmt.Println("Removed file " + filename + ".png")
 }
 
-func CartridgePage(w http.ResponseWriter, r *http.Request){
-	/*
-db.First(&user)
-
-user.Name = "jinzhu 2"
-user.Age = 100
-db.Save(&user)
-	*/
+func CartridgePage(w http.ResponseWriter, r *http.Request) {
 	db, err := gorm.Open(sqlite.Open("printer.db"), &gorm.Config{})
 	if err != nil {
 		fmt.Println("Error during opening DB")
 	} else {
-		for i := 1; i < 4; i++ {
-			var cartridge Cartridges
-			db.Where("id = ?", i).First(&cartridge)
-			cartridge.Quantity = 0
-			db.Save(&cartridge)
-		}
 
 		var cartridges []Cartridges
 		var names []string
 		db.Find(&cartridges)
-		for _, v := range cartridges{
-			name := v.Name + ": " + string(v.Quantity)
+		for _, v := range cartridges {
+			qua := fmt.Sprint(v.Quantity)
+			name := v.Name + ": " + qua
 			names = append(names, name)
 		}
 
@@ -119,7 +106,7 @@ func PrinterPage(w http.ResponseWriter, r *http.Request) {
 			db.Where("Printer_Id = ?", printer.ID).Find(&cot)
 			for _, v := range cot {
 				var cart Cartridges
-				if v.Printer_Id == printer.ID{
+				if v.Printer_Id == printer.ID {
 					db.Where("ID = ?", v.Cartridge_Id).First(&cart)
 					cartridges = append(cartridges, cart.Name)
 				}
@@ -233,24 +220,24 @@ func GenerateQR(w http.ResponseWriter, r *http.Request) {
 	GenerateFromWeb(w, r, text)
 }
 
-func GenerateFromWeb(w http.ResponseWriter, r *http.Request, printerName string){
+func GenerateFromWeb(w http.ResponseWriter, r *http.Request, printerName string) {
 	qrtext := "https://printers-ttit.herokuapp.com/printer/" + printerName // Генерация URL
 	fmt.Println("Generating QR code with text: " + qrtext + " for " + r.RemoteAddr)
 	filename := GenerateRandomString(10) // Генерация имени файла
 	fmt.Println("Generated filename " + filename + " for " + r.RemoteAddr)
 	err := generateFromText(qrtext, filename) // qrtext - текст в QR, filename - имя файла
 
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 	}
 
 	fmt.Println("Setting header Content-Disposition for " + r.RemoteAddr)
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename +".png"))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename+".png"))
 	fmt.Println("Starting serving file for " + r.RemoteAddr)
-	http.ServeFile(w, r, filename + ".png")
+	http.ServeFile(w, r, filename+".png")
 }
 
-func generateFromText(text string, filename string) error{
+func generateFromText(text string, filename string) error {
 	code, err := qr.Encode(text, qr.L, qr.Auto)
 	if err != nil {
 		return fmt.Errorf("Error during generating QR code")
@@ -264,13 +251,13 @@ func generateFromText(text string, filename string) error{
 	}
 
 	err = writePng(filename, code)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func writePng(filename string, img image.Image) error{
+func writePng(filename string, img image.Image) error {
 	file, err := os.Create(filename + ".png")
 	if err != nil {
 		return fmt.Errorf("Creating file error")
@@ -284,11 +271,11 @@ func writePng(filename string, img image.Image) error{
 }
 
 func GenerateRandomString(n int) string {
-    b := make([]rune, n)
-    for i := range b {
-        b[i] = letterRunes[rand.Intn(len(letterRunes))]
-    }
-    return string(b)
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }
 
 func PrinterList(w http.ResponseWriter, r *http.Request) {
@@ -333,4 +320,3 @@ func cartridgeQR(text string, filename string) {
 
 	writePng(filename, code)
 }
-
