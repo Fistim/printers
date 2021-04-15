@@ -191,7 +191,12 @@ func AddPrinter(w http.ResponseWriter, r *http.Request) {
 
 func GenerateQR(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm() // Получение имени принтера
-	qrtext := "https://printers-ttit.herokuapp.com/printer/" + strings.Join(r.Form["printer"], "") // Генерация URL
+	text := strings.Join(r.Form["printer"], "")
+	GenerateFromWeb(w, r, text)
+}
+
+func GenerateFromWeb(w http.ResponseWriter, r *http.Request, printerName string){
+	qrtext := "https://printers-ttit.herokuapp.com/printer/" +  // Генерация URL
 	fmt.Println("Generating QR code with text: " + qrtext + " for " + r.RemoteAddr)
 	filename := GenerateRandomString(10) // Генерация имени файла
 	fmt.Println("Generated filename " + filename + " for " + r.RemoteAddr)
