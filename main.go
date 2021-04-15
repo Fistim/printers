@@ -94,11 +94,6 @@ func PrinterPage(w http.ResponseWriter, r *http.Request) {
 
 			tmpl, _ := template.ParseFiles("output.html")
 			tmpl.Execute(w, data)
-			// fmt.Fprintf(w, "Выбранный принтер: %v\n", name)
-			// fmt.Fprintf(w, "Совместимые картриджи (" + string(len(cartridges)) + ")\n")
-			// for _, cartridge := range cartridges{
-			// 	fmt.Fprintf(w, cartridge)
-			// }
 		} else {
 			http.Redirect(w, r, "https://www.youtube.com/watch?v=dQw4w9WgXcQ", 301)
 		}
@@ -209,7 +204,7 @@ func GenerateQR(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Setting header Content-Disposition for " + r.RemoteAddr)
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename +".png"))
 	fmt.Println("Starting serving file for " + r.RemoteAddr)
-	http.ServeFile(w, r, filename)
+	http.ServeFile(w, r, filename + ".png")
 }
 
 func generateFromText(text string, filename string) error{
