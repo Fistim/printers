@@ -201,7 +201,6 @@ func GenerateQR(w http.ResponseWriter, r *http.Request) {
 	generateFromText(qrtext, filename) // qrtext - текст в QR, filename - имя файла
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename +".png"))
 	http.ServeFile(w, r, filename)
-	os.Remove(filename + ".png")
 }
 
 func generateFromText(text string, filename string) {
