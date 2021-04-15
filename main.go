@@ -64,13 +64,23 @@ func generateCompatible(w http.ResponseWriter, r *http.Request){
 }
 
 func CartridgePage(w http.ResponseWriter, r *http.Request){
+	/*
+db.First(&user)
+
+user.Name = "jinzhu 2"
+user.Age = 100
+db.Save(&user)
+	*/
 	db, err := gorm.Open(sqlite.Open("printer.db"), &gorm.Config{})
 	if err != nil {
 		fmt.Println("Error during opening DB")
 	} else {
-		var Cartridges Cartridges
-		db.Model(&Cartridges{}).Update("Quantity", 0)
-		var names []string
+		for i = 1; i < 4; i++ {
+			var cartridge Cartridges
+			db.Where("id = ?", i).First(&cartridge)
+			cartridge.Quantity = 0
+			db.Save(&cartridge)
+		}
 
 		var cartridges []Cartridges
 		db.Find(&cartridges)
