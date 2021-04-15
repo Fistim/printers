@@ -196,12 +196,11 @@ func AddPrinter(w http.ResponseWriter, r *http.Request) {
 
 func GenerateQR(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	text := strings.Join(r.Form["printer"], "")
-	qrtext := r.URL.Path + "/printer/" + text
+	qrtext := r.URL.Path + "/printer/" + strings.Join(r.Form["printer"], "")
 	filename := GenerateRandomString(10)
 	generateFromText(qrtext, filename)
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename +".png"))
-	http.ServeFile(w, r, text)
+	http.ServeFile(w, r, qrtext)
 	os.Remove(filename + ".png")
 }
 
