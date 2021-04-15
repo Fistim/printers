@@ -195,13 +195,49 @@ func AddPrinter(w http.ResponseWriter, r *http.Request) {
 }
 
 func GenerateQR(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	qrtext := r.URL.Path + "/printer/" + strings.Join(r.Form["printer"], "")
-	filename := GenerateRandomString(10)
-	generateFromText(qrtext, filename)
+	r.ParseForm() // Получение имени принтера
+	qrtext := r.URL.Path + "/printer/" + strings.Join(r.Form["printer"], "") // Генерация URL
+	filename := GenerateRandomString(10) // Генерация имени файла
+	generateFromText(qrtext, filename) // qrtext - текст в QR, filename - имя файла
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename +".png"))
-	http.ServeFile(w, r, qrtext)
+	http.ServeFile(w, r, filename)
 	os.Remove(filename + ".png")
+}
+
+func generateFromText(text string, filename string) {
+	code, err := qr.Encode(text, qr.L, qr.Auto)
+	if err != nil {
+		fmt.Println("Something went wrong...")
+	}
+	if text != code.Content() {
+		log.Fatal("data differs")
+	}
+	code, err = barcode.Scale(code, 512, 512)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	writePng(filename, code)
+}
+
+func writePng(filename string, img image.Image) {
+	file, err := os.Create(filename + ".png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = png.Encode(file, img)
+	if err != nil {
+		log.Fatal(err)
+	}
+	file.Close()
+}
+
+func GenerateRandomString(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letterRunes[rand.Intn(len(letterRunes))]
+    }
+    return string(b)
 }
 
 func PrinterList(w http.ResponseWriter, r *http.Request) {
@@ -247,38 +283,3 @@ func cartridgeQR(text string, filename string) {
 	writePng(filename, code)
 }
 
-func generateFromText(text string, filename string) {
-	code, err := qr.Encode(text, qr.L, qr.Auto)
-	if err != nil {
-		fmt.Println("Something went wrong...")
-	}
-	if text != code.Content() {
-		log.Fatal("data differs")
-	}
-	code, err = barcode.Scale(code, 512, 512)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	writePng(filename, code)
-}
-
-func writePng(filename string, img image.Image) {
-	file, err := os.Create(filename + ".png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = png.Encode(file, img)
-	if err != nil {
-		log.Fatal(err)
-	}
-	file.Close()
-}
-
-func GenerateRandomString(n int) string {
-    b := make([]rune, n)
-    for i := range b {
-        b[i] = letterRunes[rand.Intn(len(letterRunes))]
-    }
-    return string(b)
-}
