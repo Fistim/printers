@@ -5,11 +5,11 @@
 </head>
 <body>
 	<p>Список картриджей и их количество:</p>
-	<ul>
+	<!-- <ul>
 		{{ range .Name }}
 		<li>{{ . }}</li>
 		{{ end }}
-	</ul>
+	</ul> -->
 
 	<table>
 		<tr>
@@ -21,6 +21,7 @@
 			<td>{{ .Name }}</td>
 			<td>{{ .Quantity }}</td>
 		</tr>
+		{{ end }}
 	</table>
 </body>
 </html>
