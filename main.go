@@ -70,6 +70,10 @@ func CartridgePage(w http.ResponseWriter, r *http.Request){
 	} else {
 		var cartridges []Cartridges
 		db.Find(&cartridges)
+		for _, v := range cartridges{
+			v.Quantity = 0
+		}
+		db.Save(&cartridges)
 		var names []string
 		for _, v := range cartridges{
 			name := v.Name + ": " + string(v.Quantity)
