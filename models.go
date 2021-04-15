@@ -8,7 +8,6 @@ type ViewData struct {
 
 type CartridgesOutput struct{
 	Name []string
-	Quantity []uint
 }
 
 type Output struct {

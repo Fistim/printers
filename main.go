@@ -71,16 +71,14 @@ func CartridgePage(w http.ResponseWriter, r *http.Request){
 		var cartridges []Cartridges
 		db.Find(&cartridges)
 		var names []string
-		var quantities []uint
 		for _, v := range cartridges{
-			names = append(names, v.Name)
-			quantities = append(quantities, v.Quantity)
+			name := v.Name + ": " + string(v.Quantity)
 		}
 
 		data := CartridgesOutput{
 			Name: names,
-			Quantity: quantities,
 		}
+
 		tmpl, _ := template.ParseFiles("cartridges.html")
 		tmpl.Execute(w, data)
 	}
