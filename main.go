@@ -69,8 +69,11 @@ func CartridgePage(w http.ResponseWriter, r *http.Request){
 		fmt.Println("Error during opening DB")
 	} else {
 		var Cartridge Cartridges
-		db.Model(&cartridge{}).Update("Quantity", 0)
+		db.Model(&Cartridge{}).Update("Quantity", 0)
 		var names []string
+
+		var cartridges []Cartridges
+		db.Find(&cartridges)
 		for _, v := range cartridges{
 			name := v.Name + ": " + string(v.Quantity)
 			names = append(names, name)
