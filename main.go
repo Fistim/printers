@@ -75,7 +75,7 @@ db.Save(&user)
 	if err != nil {
 		fmt.Println("Error during opening DB")
 	} else {
-		for i = 1; i < 4; i++ {
+		for i := 1; i < 4; i++ {
 			var cartridge Cartridges
 			db.Where("id = ?", i).First(&cartridge)
 			cartridge.Quantity = 0
@@ -83,6 +83,7 @@ db.Save(&user)
 		}
 
 		var cartridges []Cartridges
+		var names []string
 		db.Find(&cartridges)
 		for _, v := range cartridges{
 			name := v.Name + ": " + string(v.Quantity)
