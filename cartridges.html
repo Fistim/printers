@@ -10,5 +10,17 @@
 		<li>{{ . }}</li>
 		{{ end }}
 	</ul>
+
+	<table>
+		<tr>
+			<td>Наименование</td>
+			<td>Количество</td>
+		</tr>
+		{{ range . }}
+		<tr>
+			<td>{{ .Name }}</td>
+			<td>{{ .Quantity }}</td>
+		</tr>
+	</table>
 </body>
 </html>

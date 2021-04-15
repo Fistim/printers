@@ -68,18 +68,28 @@ func CartridgePage(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error during opening DB")
 	} else {
 
+		// var cartridges []Cartridges
+		// var names []string
+		// db.Find(&cartridges)
+		// for _, v := range cartridges {
+		// 	qua := fmt.Sprint(v.Quantity)
+		// 	name := v.Name + ": " + qua
+		// 	names = append(names, name)
+		// }
+
+		// data := CartridgesOutput{
+		// 	Name: names,
+		// }
+
 		var cartridges []Cartridges
-		var names []string
 		db.Find(&cartridges)
+		var cvd []CartridgesViewData
 		for _, v := range cartridges {
-			qua := fmt.Sprint(v.Quantity)
-			name := v.Name + ": " + qua
-			names = append(names, name)
+			cvd.Name = v.Name
+			cvd.Quantity = v.Quantity
 		}
 
-		data := CartridgesOutput{
-			Name: names,
-		}
+		data := cvd
 
 		tmpl, _ := template.ParseFiles("cartridges.html")
 		tmpl.Execute(w, data)
