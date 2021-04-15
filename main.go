@@ -93,7 +93,12 @@ func CartridgePage(w http.ResponseWriter, r *http.Request) {
 
 		data := cvd
 
-		tmpl, _ := template.ParseFiles("cartridges.html")
+		tmpl, err := template.ParseFiles("cartridges.html")
+
+		if err != nil{
+			fmt.Println("Error parsing files")
+		}
+
 		tmpl.Execute(w, data)
 	}
 }
