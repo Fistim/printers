@@ -26,7 +26,7 @@ func init() {
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func main() {
-
+	port := os.Getenv("PORT")
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", PrinterList)
@@ -40,7 +40,7 @@ func main() {
 	fmt.Println("Server is listening...")
 
 	http.Handle("/", r)
-	http.ListenAndServe(":8888", nil)
+	http.ListenAndServe(":" + port, nil)
 }
 
 func generateCompatible(w http.ResponseWriter, r *http.Request){
