@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Картриджа</title>
+</head>
+<body>
+	<p>Список картриджей и их количество:</p>
+	<table>
+		<tr>
+			<td>Наименование</td>
+			<td>Количество</td>
+		</tr>
+		{{ range . }}
+		<tr>
+			{{ range .Name }}
+			<td>{{ . }}</td>
+			{{ end }}
+			{{ range .Quantity }}
+			<td>{{ . }}</td>
+			{{ end }}
+		</tr>
+		{{ end }}
+	</ul>
+</body>
+</html>

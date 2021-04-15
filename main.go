@@ -37,7 +37,9 @@ func main() {
 	r.HandleFunc("/cartridgeOfPrinter", AddCartridgeOfPrinter)
 	r.HandleFunc("/compatible", FindCompatibleCartridges)
 	r.HandleFunc("/printer/{printerName}", PrinterPage)
+	r.HandleFunc("/cartridges", CartridgePage)
 	fmt.Println("Server is listening...")
+
 
 	http.Handle("/", r)
 	http.ListenAndServe(":" + port, nil)
@@ -59,6 +61,29 @@ func generateCompatible(w http.ResponseWriter, r *http.Request){
 	fmt.Println("Served file " + filename + ".png for " + r.RemoteAddr)
 	os.Remove(filename + ".png")
 	fmt.Println("Removed file " + filename + ".png")
+}
+
+func CartridgePage(w http.ResponseWriter, r *http.Request){
+	db, err := gorm.Open(sqlite.Open("printer.db"), &gorm.Config{})
+	if err != nil {
+		fmt.Println("Error during opening DB")
+	} else {
+		var cartridges []Cartridges
+		db.Find(&cartridges)
+		var names []string
+		var quantities []uint
+		for _, v := range cartridges{
+			names = append(names, v.Name)
+			quantities = append(quantities, v.Quantity)
+		}
+
+		data := CartridgesOutput{
+			Name: names,
+			Quantity: quantities,
+		}
+		tmpl, _ := template.ParseFiles("cartridges.html")
+		tmpl.Execute(w, data)
+	}
 }
 
 func PrinterPage(w http.ResponseWriter, r *http.Request) {
