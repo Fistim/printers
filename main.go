@@ -73,6 +73,7 @@ func CartridgePage(w http.ResponseWriter, r *http.Request){
 		var names []string
 		for _, v := range cartridges{
 			name := v.Name + ": " + string(v.Quantity)
+			names = append(names, name)
 		}
 
 		data := CartridgesOutput{
