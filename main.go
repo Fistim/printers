@@ -68,8 +68,8 @@ func CartridgePage(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		fmt.Println("Error during opening DB")
 	} else {
-		var Cartridge Cartridges
-		db.Model(&Cartridge{}).Update("Quantity", 0)
+		var Cartridges Cartridges
+		db.Model(&Cartridges{}).Update("Quantity", 0)
 		var names []string
 
 		var cartridges []Cartridges
