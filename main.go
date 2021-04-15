@@ -197,38 +197,51 @@ func AddPrinter(w http.ResponseWriter, r *http.Request) {
 func GenerateQR(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm() // Получение имени принтера
 	qrtext := r.URL.Path + "/printer/" + strings.Join(r.Form["printer"], "") // Генерация URL
+	fmt.Println("Generating QR code with text: " + qrtext + " for " + r.RemoteAddr)
 	filename := GenerateRandomString(10) // Генерация имени файла
-	generateFromText(qrtext, filename) // qrtext - текст в QR, filename - имя файла
+	fmt.Println("Generated filename " + filename + " for " + r.RemoteAddr)
+	err := generateFromText(qrtext, filename) // qrtext - текст в QR, filename - имя файла
+
+	if err != nil{
+		fmt.Println(err)
+	}
+
+	fmt.Println()
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename +".png"))
 	http.ServeFile(w, r, filename)
 }
 
-func generateFromText(text string, filename string) {
+func generateFromText(text string, filename string) error{
 	code, err := qr.Encode(text, qr.L, qr.Auto)
 	if err != nil {
-		fmt.Println("Something went wrong...")
+		return fmt.Errorf("Error during generating QR code")
 	}
 	if text != code.Content() {
-		log.Fatal("data differs")
+		return fmt.Errorf("data differs")
 	}
 	code, err = barcode.Scale(code, 512, 512)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("Error during scaling QR code")
 	}
 
-	writePng(filename, code)
+	err = writePng(filename, code)
+	if err != nil{
+		return err
+	}
+	return nil
 }
 
-func writePng(filename string, img image.Image) {
+func writePng(filename string, img image.Image) error{
 	file, err := os.Create(filename + ".png")
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("Creating file error")
 	}
 	err = png.Encode(file, img)
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("PNG file error")
 	}
 	file.Close()
+	return nil
 }
 
 func GenerateRandomString(n int) string {
