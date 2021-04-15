@@ -97,6 +97,7 @@ func CartridgePage(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil{
 			fmt.Println("Error parsing files")
+			fmt.Println(err)
 		}
 
 		tmpl.Execute(w, data)
