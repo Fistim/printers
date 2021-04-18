@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"fmt"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
@@ -72,6 +73,7 @@ func generateCompatible(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Served file " + filename + ".png for " + r.RemoteAddr)
 	os.Remove(filename + ".png")
 	fmt.Println("Removed file " + filename + ".png")
+	http.Redirect(w, r, "/", 301)
 }
 
 func CartridgePage(w http.ResponseWriter, r *http.Request) {
