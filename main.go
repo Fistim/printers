@@ -38,10 +38,22 @@ func main() {
 	r.HandleFunc("/compatible", FindCompatibleCartridges)
 	r.HandleFunc("/printer/{printerName}", PrinterPage)
 	r.HandleFunc("/cartridges", CartridgePage)
+	r.HandleFunc("/updateCartridge", updateCartridge)
 	fmt.Println("Server is listening...")
 
 	http.Handle("/", r)
 	http.ListenAndServe(":"+port, nil)
+}
+
+func updateCartridges(w http.ResponseWriter, r *http.Request){
+	db, _ := gorm.Open(sqlite.Open("printer.db"), &gorm.Config{})
+
+	r.ParseForm()
+	selectedCartridge := strings.Join(r.Form["cartridges"], "")
+	var cartridge Cartridges
+	db.Where("Name = ?", selectedCartridge).First(&cartridge)
+	newQuantity := cartridge.Quantity + r.Form["cartridgeQuantity"]
+	db.Model(&cartridge).Update("Quantity", newQuantity)
 }
 
 func generateCompatible(w http.ResponseWriter, r *http.Request) {
