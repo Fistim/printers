@@ -57,7 +57,7 @@ func updateCartridges(w http.ResponseWriter, r *http.Request){
 		fmt.Println("Someone tries to update int value by string. Someone: " + r.RemoteAddr)
 
 	} 
-	newQuantity := cartridge.Quantity + )
+	newQuantity := cartridge.Quantity + quantity
 	db.Model(&cartridge).Update("Quantity", newQuantity)
 	http.Redirect(w, r, "/", 301)
 }
