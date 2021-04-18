@@ -83,9 +83,9 @@ func CartridgePage(w http.ResponseWriter, r *http.Request) {
 
 		var cartridges []Cartridges
 		db.Find(&cartridges)
-		var cvd []CartridgeViewData
+		var cvd []CartridgesViewData
 		for _, v := range cartridges{
-			var tmp CartridgeViewData
+			var tmp CartridgesViewData
 			tmp.Name = v.Name
 			tmp.Quantity = fmt.Sprint(v.Quantity)
 			cvd = append(cvd, tmp)
