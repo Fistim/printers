@@ -5,23 +5,10 @@
 </head>
 <body>
 	<p>Список картриджей и их количество:</p>
-	<!-- <ul>
+	<ul>
 		{{ range .Name }}
 		<li>{{ . }}</li>
 		{{ end }}
-	</ul> -->
-
-	<table>
-		<thead>
-			<th>Наименование</th>
-			<th>Количество</th>
-		</thead>
-		{{ range . }}
-		<tr>
-			<td>{{ .Name }}</td>
-			<td>{{ printf "%d" .Quantity }}</td>
-		</tr>
-		{{ end }}
-	</table>
+	</ul>
 </body>
 </html>

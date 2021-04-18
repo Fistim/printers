@@ -10,11 +10,6 @@ type CartridgesOutput struct {
 	Name []string
 }
 
-type CartridgesViewData struct{
-	Name string
-	Quantity string
-}
-
 type Output struct {
 	PrinterName string
 	Cartridges  []string
