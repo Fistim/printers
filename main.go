@@ -83,15 +83,13 @@ func CartridgePage(w http.ResponseWriter, r *http.Request) {
 
 		var cartridges []Cartridges
 		db.Find(&cartridges)
-		var cvd []CartridgesViewData
-		for _, v := range cartridges {
-			var tmp CartridgesViewData
+		var cvd []CartridgeViewData
+		for _, v := range cartridges{
+			var tmp CartridgeViewData
 			tmp.Name = v.Name
 			tmp.Quantity = fmt.Sprint(v.Quantity)
 			cvd = append(cvd, tmp)
 		}
-
-		data := cvd
 
 		tmpl, err := template.ParseFiles("cartridges.html")
 
@@ -100,7 +98,7 @@ func CartridgePage(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err)
 		}
 
-		tmpl.Execute(w, data)
+		tmpl.Execute(w, cvd)
 	}
 }
 

@@ -12,14 +12,14 @@
 	</ul> -->
 
 	<table>
-		<tr>
-			<td>Наименование</td>
-			<td>Количество</td>
-		</tr>
+		<thead>
+			<th>Наименование</th>
+			<th>Количество</th>
+		</thead>
 		{{ range . }}
 		<tr>
 			<td>{{ .Name }}</td>
-			<td>{{ .Quantity }}</td>
+			<td>{{ printf "%d" .Quantity }}</td>
 		</tr>
 		{{ end }}
 	</table>
