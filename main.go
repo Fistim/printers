@@ -12,7 +12,6 @@ import (
 	"image"
 	"image/png"
 	"io/ioutil"
-	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -53,7 +52,7 @@ func updateCartridges(w http.ResponseWriter, r *http.Request){
 	selectedCartridge := strings.Join(r.Form["cartridges"], "")
 	var cartridge Cartridges
 	db.Where("Name = ?", selectedCartridge).First(&cartridge)
-	newQuantity := cartridge.Quantity + strconv.Atoi(r.Form["cartridgeQuantity"])
+	newQuantity := cartridge.Quantity + strconv.Atoi(strings.Join(r.Form["cartridgeQuantity"], "")])
 	db.Model(&cartridge).Update("Quantity", newQuantity)
 }
 
@@ -331,7 +330,7 @@ func cartridgeQR(text string, filename string) {
 		fmt.Println("Something went wrong...")
 	}
 	if text != code.Content() {
-		log.Fatal("data differs")
+		panic("data differs")
 	}
 	code, err = barcode.Scale(code, 512, 512)
 	if err != nil {
