@@ -52,8 +52,14 @@ func updateCartridges(w http.ResponseWriter, r *http.Request){
 	selectedCartridge := strings.Join(r.Form["cartridges"], "")
 	var cartridge Cartridges
 	db.Where("Name = ?", selectedCartridge).First(&cartridge)
-	newQuantity := cartridge.Quantity + strconv.Atoi(strings.Join(r.Form["cartridgeQuantity"], "")])
+	quantity, err := strconv.Atoi(strings.Join(r.Form["cartridgeQuantity"], "")
+	if err != nil {
+		fmt.Println("Someone tries to update int value by string. Someone: " + r.RemoteAddr)
+
+	} 
+	newQuantity := cartridge.Quantity + )
 	db.Model(&cartridge).Update("Quantity", newQuantity)
+	http.Redirect(w, r, "/", 301)
 }
 
 func generateCompatible(w http.ResponseWriter, r *http.Request) {
