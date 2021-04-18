@@ -91,7 +91,7 @@ func CartridgePage(w http.ResponseWriter, r *http.Request) {
 			cvd = append(cvd, tmp)
 		}
 
-		tmpl, err := template.ParseFiles("cartridges.html")
+		tmpl, err := template.ParseFiles("cartridges.gohtml")
 
 		if err != nil{
 			fmt.Println("Error parsing files")
