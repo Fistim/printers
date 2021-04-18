@@ -38,7 +38,7 @@ func main() {
 	r.HandleFunc("/compatible", FindCompatibleCartridges)
 	r.HandleFunc("/printer/{printerName}", PrinterPage)
 	r.HandleFunc("/cartridges", CartridgePage)
-	r.HandleFunc("/updateCartridge", updateCartridge)
+	r.HandleFunc("/updateCartridge", updateCartridges)
 	fmt.Println("Server is listening...")
 
 	http.Handle("/", r)
@@ -52,7 +52,7 @@ func updateCartridges(w http.ResponseWriter, r *http.Request){
 	selectedCartridge := strings.Join(r.Form["cartridges"], "")
 	var cartridge Cartridges
 	db.Where("Name = ?", selectedCartridge).First(&cartridge)
-	newQuantity := cartridge.Quantity + r.Form["cartridgeQuantity"]
+	newQuantity := cartridge.Quantity + strconv.Atoi(r.Form["cartridgeQuantity"])
 	db.Model(&cartridge).Update("Quantity", newQuantity)
 }
 
