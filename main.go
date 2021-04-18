@@ -26,7 +26,7 @@ func init() {
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 
 func main() {
-	port := os.Getenv("PORT")
+	// port := os.Getenv("PORT")
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", PrinterList)
@@ -42,7 +42,7 @@ func main() {
 	fmt.Println("Server is listening...")
 
 	http.Handle("/", r)
-	http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":80"/*+port*/, nil)
 }
 
 func updateCartridges(w http.ResponseWriter, r *http.Request){
@@ -52,12 +52,12 @@ func updateCartridges(w http.ResponseWriter, r *http.Request){
 	selectedCartridge := strings.Join(r.Form["cartridges"], "")
 	var cartridge Cartridges
 	db.Where("Name = ?", selectedCartridge).First(&cartridge)
-	quantity, err := strconv.Atoi(strings.Join(r.Form["cartridgeQuantity"], "")
+	quantity, err := strconv.Atoi(strings.Join(r.Form["cartridgeQuantity"], ""))
 	if err != nil {
 		fmt.Println("Someone tries to update int value by string. Someone: " + r.RemoteAddr)
 
 	} 
-	newQuantity := cartridge.Quantity + quantity
+	newQuantity := cartridge.Quantity + uint(quantity)
 	db.Model(&cartridge).Update("Quantity", newQuantity)
 	http.Redirect(w, r, "/", 301)
 }
@@ -340,7 +340,7 @@ func cartridgeQR(text string, filename string) {
 	}
 	code, err = barcode.Scale(code, 512, 512)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	writePng(filename, code)

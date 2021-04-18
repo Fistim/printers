@@ -49,9 +49,10 @@
 		<select name="cartridges">
 			<option></option>
 			{{ range .CartridgeNames }}
-			<option value="{{ . }}"></option>
+			<option value="{{ . }}">{{ . }}</option>
 			{{ end }}
-			<input type="number" name="cartridgeQuantity">
+			<input type="number" name="cartridgeQuantity" placeholder="Количество">
+			<input type="submit" value="Изменить">
 		</select>
 	</form>
 	<br><br>
