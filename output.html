@@ -5,14 +5,26 @@
 </head>
 <body>
 	<p>Выбранный принтер: {{ .PrinterName }}</p>
-	<p>Совместимые картриджи:</p>
+	<p>Доступные для установки в этот принтер картриджи:</p>
 	<ul>
 		{{ range .Cartridges }}
 		<li>{{ . }}</li>
+		{{ else }}
+		<li>Нет доступных картриджей</li>
 		{{ end }}
 	</ul>
 
 	<input type="button" name="generateQR" value="Сгенерировать QR" onclick="getURL();">
+
+	<p>Установить картридж:</p>
+	<form action="/decreaseCartridgeQuantity" method="POST">
+		<select name="cartridge" id="cartridge">
+			{{ range .Cartridges }}
+			<option>{{ . }}</option>
+			{{ end }}
+		</select>
+		<input type="submit" value="Установить">
+	</form>
 
 
 	<script type="text/javascript">

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"strconv"
 	"fmt"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
@@ -15,6 +14,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -39,13 +39,30 @@ func main() {
 	r.HandleFunc("/printer/{printerName}", PrinterPage)
 	r.HandleFunc("/cartridges", CartridgePage)
 	r.HandleFunc("/updateCartridge", updateCartridges)
+	r.HandleFunc("/decreaseCartridgeQuantity", decreaseCartridgeQuantity)
 	fmt.Println("Server is listening...")
 
 	http.Handle("/", r)
-	http.ListenAndServe(":80"/*+port*/, nil)
+	http.ListenAndServe(":80" /*+port*/, nil)
 }
 
-func updateCartridges(w http.ResponseWriter, r *http.Request){
+func decreaseCartridgeQuantity(w http.ResponseWriter, r *http.Request) {
+	db, _ := gorm.Open(sqlite.Open("printer.db"), &gorm.Config{})
+	r.ParseForm()
+	selectedCartridge := strings.Join(r.Form["cartridge"], "")
+	var cartridge Cartridges
+	db.Where("Name = ?", selectedCartridge).First(&cartridge)
+
+	if cartridge.Quantity > 0 {
+		newQuantity := cartridge.Quantity - 1
+		db.Model(&cartridge).Update("Quantity", newQuantity)
+	} else {
+		fmt.Sprint(w, "Картридж закончился")
+	}
+	http.Redirect(w, r, "/", 301)
+}
+
+func updateCartridges(w http.ResponseWriter, r *http.Request) {
 	db, _ := gorm.Open(sqlite.Open("printer.db"), &gorm.Config{})
 
 	r.ParseForm()
@@ -56,7 +73,7 @@ func updateCartridges(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		fmt.Println("Someone tries to update int value by string. Someone: " + r.RemoteAddr)
 
-	} 
+	}
 	newQuantity := cartridge.Quantity + uint(quantity)
 	db.Model(&cartridge).Update("Quantity", newQuantity)
 	http.Redirect(w, r, "/", 301)
@@ -102,7 +119,7 @@ func CartridgePage(w http.ResponseWriter, r *http.Request) {
 
 		tmpl, err := template.ParseFiles("cartridges.gohtml")
 
-		if err != nil{
+		if err != nil {
 			fmt.Println("Error parsing files")
 			fmt.Println(err)
 		}
@@ -129,11 +146,14 @@ func PrinterPage(w http.ResponseWriter, r *http.Request) {
 			var cot []Cartridgeofprinter
 			db.Find(&cot)
 			db.Where("Printer_Id = ?", printer.ID).Find(&cot)
+			fmt.Println(cot)
 			for _, v := range cot {
 				var cart Cartridges
 				if v.Printer_Id == printer.ID {
 					db.Where("ID = ?", v.Cartridge_Id).First(&cart)
-					cartridges = append(cartridges, cart.Name)
+					if cart.Quantity > 0 {
+						cartridges = append(cartridges, cart.Name)
+					}
 				}
 			}
 
