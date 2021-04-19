@@ -26,7 +26,7 @@ func init() {
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 
 func main() {
-	// port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", PrinterList)
@@ -43,7 +43,7 @@ func main() {
 	fmt.Println("Server is listening...")
 
 	http.Handle("/", r)
-	http.ListenAndServe(":80" /*+port*/, nil)
+	http.ListenAndServe(":"+port, nil)
 }
 
 func decreaseCartridgeQuantity(w http.ResponseWriter, r *http.Request) {
