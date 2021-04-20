@@ -2,11 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/qr"
-	"github.com/gorilla/mux"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 	"html/template"
 	"image"
 	"image/png"
@@ -17,6 +12,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/qr"
+	"github.com/gorilla/mux"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -88,7 +89,9 @@ func generateCompatible(w http.ResponseWriter, r *http.Request) {
 	}
 	filename := GenerateRandomString(10)
 	fmt.Println("Generated name " + filename + " for " + r.RemoteAddr)
-	generateFromText(string(data), filename)
+	dataString := string(data)
+	dataString = strings.ReplaceAll(dataString, " ", "%20")
+	generateFromText(dataString, filename)
 	fmt.Println("Generated file " + filename + ".png for " + r.RemoteAddr)
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename+".png"))
 	http.ServeFile(w, r, filename)
